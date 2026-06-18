@@ -7,6 +7,13 @@ Describes how to start streaming and receive payloads.
 cargo run --example stream --features=libusb
 ```
 
+## [buffer_framerate.rs](buffer_framerate.rs)
+Describes how to receive camera buffers and log payload metadata, a small buffer preview, and measured frame rate.
+
+```sh
+cargo run --example buffer_framerate --features=libusb -- [preview_bytes]
+```
+
 ## [params.rs](params.rs)
 Describes how to configure parameters of a camera.
 
