@@ -8,10 +8,10 @@ cargo run --example stream --features=libusb
 ```
 
 ## [buffer_framerate.rs](buffer_framerate.rs)
-Describes how to receive camera buffers and log payload metadata, a small buffer preview, and measured frame rate.
+Describes how to set the camera frame rate, receive camera buffers, and log payload metadata, a small buffer preview, and measured frame rate.
 
 ```sh
-cargo run --example buffer_framerate --features=libusb -- [preview_bytes]
+cargo run --example buffer_framerate --features=libusb -- [target_fps] [preview_bytes] [exposure_us]
 ```
 
 ## [params.rs](params.rs)
