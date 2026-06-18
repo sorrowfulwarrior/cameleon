@@ -467,7 +467,7 @@ impl DeviceControl for ControlHandle {
 
         let required_leader_size = unwrap_or_log!(sirm.required_leader_size(self));
         let required_payload_size = unwrap_or_log!(sirm.required_payload_size(self));
-        let required_trailer_size = unwrap_or_log!(sirm.required_leader_size(self));
+        let required_trailer_size = unwrap_or_log!(sirm.required_trailer_size(self));
 
         let payload_transfer_size = align!(PAYLOAD_TRANSFER_SIZE, u32);
         let payload_transfer_count = (required_payload_size / payload_transfer_size as u64) as u32;

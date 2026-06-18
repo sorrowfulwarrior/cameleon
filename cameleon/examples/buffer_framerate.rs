@@ -163,22 +163,59 @@ fn hex_preview(buffer: &[u8], preview_bytes: usize) -> String {
         .join(" ")
 }
 
-fn configure_camera<Ctrl, Ctxt>(
-    params_ctxt: &mut ParamsCtxt<Ctrl, Ctxt>,
+fn configure_camera(
+    params_ctxt: &mut ParamsCtxt,
     target_fps: f64,
     exposure_us: f64,
-) -> Result<(), Box<dyn Error>>
-where
-    Ctrl: DeviceControl,
-    Ctxt: GenApiCtxt,
-{
-    configure_for_continuous_acquisition(params_ctxt)?;
-    disable_device_link_throughput_limit(params_ctxt)?;
-    disable_exposure_auto(params_ctxt)?;
-    set_exposure_time(params_ctxt, exposure_us)?;
-    enable_frame_rate_control(params_ctxt)?;
-    set_frame_rate(params_ctxt, target_fps)?;
-    print_resulting_frame_rate(params_ctxt)?;
+) -> Result<(), Box<dyn Error>> {
+    let cameleon = GenApiCtxt::new(params_ctxt);
+
+    if cameleon.get_str("AcquisitionMode")? != "Continuous" {
+        if let Err(_e) = cameleon.set_str("AcquisitionMode", "Continuous") {
+            println!("AcquisitionMode is read-only; current value is {}", cameleon.get_str("AcquisitionMode").unwrap_or_else(|_| "unknown".to_string()));
+        } else {
+            println!("set AcquisitionMode=Continuous");
+        }
+    } else {
+        println!("AcquisitionMode is read-only; current value is Continuous");
+    }
+
+    if let Err(_e) = cameleon.set_str("DeviceLinkThroughputLimitMode", "On") {
+        println!("DeviceLinkThroughputLimitMode is read-only; current value is {}", cameleon.get_str("DeviceLinkThroughputLimitMode").unwrap_or_else(|_| "unknown".to_string()));
+    } else {
+        println!("set DeviceLinkThroughputLimitMode=On");
+    }
+
+    if let Err(_e) = cameleon.set_str("ExposureAuto", "Off") {
+        println!("ExposureAuto is read-only; current value is {}", cameleon.get_str("ExposureAuto").unwrap_or_else(|_| "unknown".to_string()));
+    } else {
+        println!("set ExposureAuto=Off");
+    }
+
+    if let Err(_e) = cameleon.set_f64("ExposureTime", exposure_us) {
+        println!("ExposureTime is read-only; current value is {}", cameleon.get_f64("ExposureTime").map(|v| v.to_string()).unwrap_or_else(|_| "unknown".to_string()));
+    } else {
+        let val = cameleon.get_f64("ExposureTime")?;
+        println!("set ExposureTime={:.2} us; camera reports {:.2} us", exposure_us, val);
+    }
+
+    if let Err(_e) = cameleon.set_bool("AcquisitionFrameRateEnable", true) {
+        println!("AcquisitionFrameRateEnable is read-only; current value is {}", cameleon.get_bool("AcquisitionFrameRateEnable").map(|v| v.to_string()).unwrap_or_else(|_| "unknown".to_string()));
+    } else {
+        println!("set AcquisitionFrameRateEnable=true");
+    }
+
+    if let Err(_e) = cameleon.set_f64("AcquisitionFrameRate", target_fps) {
+        println!("AcquisitionFrameRate is read-only; current value is {}", cameleon.get_f64("AcquisitionFrameRate").map(|v| v.to_string()).unwrap_or_else(|_| "unknown".to_string()));
+    } else {
+        let val = cameleon.get_f64("AcquisitionFrameRate")?;
+        println!("set AcquisitionFrameRate={:.2}; camera reports {:.2}", target_fps, val);
+    }
+
+    if let Ok(val) = cameleon.get_f64("ResultingFrameRate") {
+        println!("ResultingFrameRate reports {:.2} FPS", val);
+    }
+
     Ok(())
 }
 
